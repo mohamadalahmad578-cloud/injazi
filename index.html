@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>إنجازي — مهامي وجدولي</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="إنجازي" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#0F172A" id="theme-color-meta" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #F8FAFC;
+      --surface: #FFFFFF;
+      --surface-2: #F1F5F9;
+      --text: #0F172A;
+      --text-muted: #64748B;
+      --border: #E2E8F0;
+      --primary: #0F172A;
+      --accent: #D4A359;
+      --accent-soft: rgba(212, 163, 89, 0.14);
+      --success: #10B981;
+      --danger: #EF4444;
+      --warning: #F59E0B;
+      --shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
+      --radius: 16px;
+    }
+    [data-theme="dark"] {
+      --bg: #0B1120;
+      --surface: #131C31;
+      --surface-2: #1E293B;
+      --text: #F8FAFC;
+      --text-muted: #94A3B8;
+      --border: #273549;
+      --primary: #D4A359;
+      --accent: #D4A359;
+      --accent-soft: rgba(212, 163, 89, 0.16);
+      --shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      font-family: 'Cairo', system-ui, -apple-system, sans-serif;
+    }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding-bottom: calc(84px + env(safe-area-inset-bottom));
+      transition: background 0.25s, color 0.25s;
+    }
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: calc(12px + env(safe-area-inset-top)) 16px 12px;
+      backdrop-filter: blur(12px);
+    }
+    .header-inner {
+      max-width: 960px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .brand-logo {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      background: #0F172A;
+      color: #D4A359;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 18px;
+      border: 1.5px solid #D4A359;
+    }
+    .brand h1 { font-size: 1.2rem; font-weight: 800; line-height: 1.2; }
+    .brand span { font-size: 0.78rem; color: var(--text-muted); display: block; }
+    .header-actions { display: flex; align-items: center; gap: 8px; }
+    .icon-btn {
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 0.85rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: transform 0.15s, background 0.2s;
+    }
+    .icon-btn:active { transform: scale(0.96); }
+    .icon-btn.accent {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .live-timer-pill {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      background: var(--accent);
+      color: #0F172A;
+      font-weight: 800;
+      font-size: 0.82rem;
+      padding: 6px 12px;
+      border-radius: 999px;
+      cursor: pointer;
+    }
+    .live-timer-pill.active { display: inline-flex; }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    /* Dashboard Summary */
+    .summary-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow);
+      margin-bottom: 18px;
+    }
+    .summary-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .progress-pct {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--accent);
+    }
+    .progress-bar-bg {
+      height: 10px;
+      background: var(--surface-2);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent), #EAB308);
+      border-radius: 999px;
+      transition: width 0.4s ease;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    .stat-box {
+      background: var(--surface-2);
+      border-radius: 12px;
+      padding: 10px;
+      text-align: center;
+    }
+    .stat-box strong { display: block; font-size: 1.2rem; font-weight: 800; }
+    .stat-box span { font-size: 0.78rem; color: var(--text-muted); }
+
+    /* Desktop Tabs */
+    .desktop-nav {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 18px;
+      background: var(--surface);
+      padding: 6px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+    }
+    .nav-btn {
+      flex: 1;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      padding: 10px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.92rem;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .nav-btn.active {
+      background: var(--primary);
+      color: #FFFFFF;
+    }
+    [data-theme="dark"] .nav-btn.active { color: #0F172A; }
+
+    /* Mobile Bottom Nav */
+    .mobile-nav {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+      justify-content: space-around;
+    }
+    .mobile-nav button {
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 4px 10px;
+      border-radius: 10px;
+    }
+    .mobile-nav button.active {
+      color: var(--accent);
+      background: var(--accent-soft);
+    }
+    .mobile-nav button .ico { font-size: 1.2rem; }
+
+    @media (max-width: 680px) {
+      .desktop-nav { display: none; }
+      .mobile-nav { display: flex; }
+    }
+
+    /* Sections */
+    .section { display: none; }
+    .section.active { display: block; animation: fadeIn 0.2s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow);
+      margin-bottom: 16px;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .form-grid .full { grid-column: 1 / -1; }
+    input, select, textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: var(--text);
+      font-size: 0.92rem;
+      outline: none;
+    }
+    input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+    .btn-primary {
+      background: var(--primary);
+      color: #FFFFFF;
+      border: none;
+      border-radius: 12px;
+      padding: 11px 16px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      width: 100%;
+    }
+    [data-theme="dark"] .btn-primary { color: #0F172A; }
+
+    .filters {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .chip-group { display: flex; gap: 6px; flex-wrap: wrap; }
+    .chip {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text-muted);
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .chip.active {
+      background: var(--accent);
+      color: #0F172A;
+      border-color: var(--accent);
+    }
+
+    /* Task & Schedule Items */
+    .item-list { display: flex; flex-direction: column; gap: 10px; }
+    .item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .item.done { opacity: 0.62; }
+    .item.done .item-title { text-decoration: line-through; }
+    .item-left { display: flex; align-items: center; gap: 12px; flex: 1; }
+    .check-btn {
+      width: 24px;
+      height: 24px;
+      border-radius: 8px;
+      border: 2px solid var(--accent);
+      background: transparent;
+      color: #0F172A;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      font-weight: 800;
+    }
+    .item.done .check-btn { background: var(--success); border-color: var(--success); color: #FFF; }
+    .item-title { font-weight: 700; font-size: 0.96rem; }
+    .item-meta { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; font-size: 0.76rem; color: var(--text-muted); }
+    .badge {
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: var(--surface-2);
+      font-weight: 700;
+    }
+    .prio-high { color: var(--danger); }
+    .prio-med { color: var(--warning); }
+    .prio-low { color: var(--success); }
+    .item-actions { display: flex; gap: 6px; }
+    .small-btn {
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 6px 9px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .small-btn.danger { color: var(--danger); }
+
+    /* Days Bar */
+    .days-bar {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+      margin-bottom: 14px;
+    }
+    .day-btn {
+      flex: 1;
+      min-width: 72px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text-muted);
+      padding: 10px 8px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      text-align: center;
+    }
+    .day-btn.active {
+      background: var(--primary);
+      color: #FFF;
+      border-color: var(--primary);
+    }
+    [data-theme="dark"] .day-btn.active { color: #0F172A; }
+
+    /* Pomodoro */
+    .pomo-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 16px;
+      padding: 12px 0;
+    }
+    .pomo-ring { position: relative; width: 220px; height: 220px; }
+    .pomo-ring svg { transform: rotate(-90deg); width: 220px; height: 220px; }
+    .pomo-time {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .pomo-time strong { font-size: 2.6rem; font-weight: 800; letter-spacing: 1px; }
+    .pomo-time span { font-size: 0.82rem; color: var(--text-muted); max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .pomo-controls { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+
+    /* Notes */
+    .notes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 12px;
+    }
+    .note-card {
+      border-radius: 14px;
+      padding: 14px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .note-card.c-gold { border-top: 4px solid #D4A359; }
+    .note-card.c-blue { border-top: 4px solid #3B82F6; }
+    .note-card.c-green { border-top: 4px solid #10B981; }
+    .note-card.c-rose { border-top: 4px solid #F43F5E; }
+    .note-text { white-space: pre-wrap; font-size: 0.92rem; line-height: 1.6; }
+
+    .empty-state {
+      text-align: center;
+      padding: 28px 16px;
+      color: var(--text-muted);
+      font-size: 0.92rem;
+    }
+
+    /* Install Modal */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(0,0,0,0.55);
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 20px;
+      max-width: 420px;
+      width: 100%;
+    }
+    .modal h3 { margin-bottom: 10px; }
+    .modal ol { padding-right: 20px; line-height: 1.8; font-size: 0.92rem; margin-bottom: 16px; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div class="brand">
+        <div class="brand-logo">إ</div>
+        <div>
+          <h1>إنجازي</h1>
+          <span id="today-date"></span>
+        </div>
+      </div>
+      <div class="header-actions">
+        <div id="live-timer-pill" class="live-timer-pill" onclick="switchTab('pomo')">⏱ <span id="pill-time">25:00</span></div>
+        <button id="install-btn" class="icon-btn accent" onclick="handleInstallClick()">📲 تثبيت</button>
+        <button id="theme-btn" class="icon-btn" onclick="toggleTheme()">🌙</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Summary -->
+    <section class="summary-card">
+      <div class="summary-top">
+        <div>
+          <strong>مؤشر إنجاز اليوم</strong>
+          <div style="font-size:0.82rem;color:var(--text-muted)">تابع تقدمك خطوة بخطوة</div>
+        </div>
+        <div class="progress-pct" id="progress-pct">0%</div>
+      </div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-bar"></div></div>
+      <div class="stats-grid">
+        <div class="stat-box"><strong id="stat-done">0</strong><span>مكتمل</span></div>
+        <div class="stat-box"><strong id="stat-left">0</strong><span>متبقي</span></div>
+        <div class="stat-box"><strong id="stat-pomo">0</strong><span>جلسات تركيز</span></div>
+      </div>
+    </section>
+
+    <!-- Desktop Nav -->
+    <nav class="desktop-nav">
+      <button class="nav-btn active" data-tab="tasks" onclick="switchTab('tasks')">✅ مهامي</button>
+      <button class="nav-btn" data-tab="schedule" onclick="switchTab('schedule')">📅 جدولي الأسبوعي</button>
+      <button class="nav-btn" data-tab="pomo" onclick="switchTab('pomo')">⏱ مؤقت التركيز</button>
+      <button class="nav-btn" data-tab="notes" onclick="switchTab('notes')">📝 ملاحظاتي</button>
+    </nav>
+
+    <!-- TASKS -->
+    <section id="sec-tasks" class="section active">
+      <div class="card">
+        <form id="task-form" class="form-grid" onsubmit="addTask(event)">
+          <input class="full" id="task-title" type="text" placeholder="أضف مهمة جديدة..." required />
+          <select id="task-cat">
+            <option value="دراسة">📚 دراسة</option>
+            <option value="مشاريع">💻 مشاريع</option>
+            <option value="شخصي">🌿 شخصي</option>
+            <option value="عام">📌 عام</option>
+          </select>
+          <select id="task-prio">
+            <option value="high">أولوية عالية</option>
+            <option value="med" selected>أولوية متوسطة</option>
+            <option value="low">أولوية منخفضة</option>
+          </select>
+          <input id="task-time" type="time" />
+          <button class="btn-primary" type="submit">+ إضافة المهمة</button>
+        </form>
+      </div>
+
+      <div class="filters">
+        <div class="chip-group" id="status-filters">
+          <button class="chip active" onclick="setTaskFilter('all', this)">الكل</button>
+          <button class="chip" onclick="setTaskFilter('active', this)">قيد الإنجاز</button>
+          <button class="chip" onclick="setTaskFilter('done', this)">مكتملة</button>
+        </div>
+        <button class="small-btn danger" onclick="clearCompletedTasks()">مسح المكتملة</button>
+      </div>
+      <div class="item-list" id="tasks-list"></div>
+    </section>
+
+    <!-- SCHEDULE -->
+    <section id="sec-schedule" class="section">
+      <div class="days-bar" id="days-bar"></div>
+      <div class="card">
+        <form id="sched-form" class="form-grid" onsubmit="addScheduleItem(event)">
+          <input class="full" id="sched-title" type="text" placeholder="عنوان الجلسة أو الموعد..." required />
+          <input id="sched-start" type="time" required />
+          <input id="sched-end" type="time" />
+          <button class="btn-primary full" type="submit">+ إضافة للجدول</button>
+        </form>
+      </div>
+      <div class="item-list" id="schedule-list"></div>
+    </section>
+
+    <!-- POMODORO -->
+    <section id="sec-pomo" class="section">
+      <div class="card pomo-wrap">
+        <div class="chip-group">
+          <button class="chip active" onclick="setPomoMode(25, 'جلسة تركيز', this)">تركيز (25 د)</button>
+          <button class="chip" onclick="setPomoMode(5, 'استراحة قصيرة', this)">استراحة (5 د)</button>
+          <button class="chip" onclick="setPomoMode(15, 'استراحة طويلة', this)">استراحة (15 د)</button>
+        </div>
+        <div class="pomo-ring">
+          <svg viewBox="0 0 220 220">
+            <circle cx="110" cy="110" r="96" fill="none" stroke="var(--surface-2)" stroke-width="12" />
+            <circle id="pomo-circle" cx="110" cy="110" r="96" fill="none" stroke="var(--accent)" stroke-width="12" stroke-linecap="round" stroke-dasharray="603.19" stroke-dashoffset="0" />
+          </svg>
+          <div class="pomo-time">
+            <strong id="pomo-display">25:00</strong>
+            <span id="pomo-task-label">جلسة تركيز</span>
+          </div>
+        </div>
+        <div class="pomo-controls">
+          <button class="btn-primary" style="width:auto;padding:10px 26px" id="pomo-start-btn" onclick="togglePomo()">ابدأ</button>
+          <button class="icon-btn" onclick="resetPomo()">إعادة</button>
+          <button class="icon-btn" id="mute-btn" onclick="toggleMute()">🔊 صوت</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- NOTES -->
+    <section id="sec-notes" class="section">
+      <div class="card">
+        <form id="note-form" class="form-grid" onsubmit="addNote(event)">
+          <textarea class="full" id="note-text" rows="3" placeholder="اكتب ملاحظة سريعة..." required></textarea>
+          <select id="note-color">
+            <option value="c-gold">ذهبي</option>
+            <option value="c-blue">أزرق</option>
+            <option value="c-green">أخضر</option>
+            <option value="c-rose">وردي</option>
+          </select>
+          <button class="btn-primary" type="submit">+ حفظ الملاحظة</button>
+        </form>
+      </div>
+      <input id="note-search" type="text" placeholder="ابحث في ملاحظاتك..." oninput="renderNotes()" style="margin-bottom:12px" />
+      <div class="notes-grid" id="notes-list"></div>
+    </section>
+  </main>
+
+  <!-- Mobile Nav -->
+  <nav class="mobile-nav">
+    <button class="active" data-tab="tasks" onclick="switchTab('tasks')"><span class="ico">✅</span>مهامي</button>
+    <button data-tab="schedule" onclick="switchTab('schedule')"><span class="ico">📅</span>جدولي</button>
+    <button data-tab="pomo" onclick="switchTab('pomo')"><span class="ico">⏱</span>التركيز</button>
+    <button data-tab="notes" onclick="switchTab('notes')"><span class="ico">📝</span>ملاحظاتي</button>
+  </nav>
+
+  <!-- iOS Install Guide Modal -->
+  <div class="modal-backdrop" id="install-modal" onclick="if(event.target===this)this.classList.remove('open')">
+    <div class="modal">
+      <h3>تثبيت «إنجازي» على الشاشة الرئيسية</h3>
+      <ol>
+        <li>افتح الرابط في متصفح <strong>Safari</strong> (على الآيفون) أو <strong>Chrome</strong> (على الأندرويد).</li>
+        <li>اضغط على زر <strong>المشاركة (Share)</strong> في الأسفل (أو النقاط الثلاث في الأعلى للأندرويد).</li>
+        <li>اختر <strong>إضافة إلى الشاشة الرئيسية (Add to Home Screen)</strong> ثم اضغط <strong>إضافة</strong>.</li>
+      </ol>
+      <button class="btn-primary" onclick="document.getElementById('install-modal').classList.remove('open')">حسناً</button>
+    </div>
+  </div>
+
+  <script>
+    const DAYS = ['السبت', 'الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة'];
+    const JS_DAY_TO_AR = [1, 2, 3, 4, 5, 6, 0]; // Sun=1 .. Sat=0
+    let state = JSON.parse(localStorage.getItem('injazi_state_v2') || 'null') || {
+      theme: 'light',
+      tasks: [],
+      schedule: {},
+      notes: [],
+      pomoCount: 0,
+      pomoDate: new Date().toDateString()
+    };
+    if (state.pomoDate !== new Date().toDateString()) {
+      state.pomoCount = 0;
+      state.pomoDate = new Date().toDateString();
+    }
+
+    let taskFilter = 'all';
+    let selectedDay = JS_DAY_TO_AR[new Date().getDay()];
+    let pomoTotal = 25 * 60, pomoLeft = 25 * 60, pomoTimer = null, pomoMuted = false, pomoLabel = 'جلسة تركيز';
+    let deferredPrompt = null;
+
+    function save() { localStorage.setItem('injazi_state_v2', JSON.stringify(state)); }
+
+    // Date & Theme
+    document.getElementById('today-date').textContent = new Intl.DateTimeFormat('ar-EG', {
+      weekday: 'long', day: 'numeric', month: 'long'
+    }).format(new Date());
+
+    function applyTheme() {
+      document.documentElement.setAttribute('data-theme', state.theme);
+      document.getElementById('theme-btn').textContent = state.theme === 'dark' ? '☀️' : '🌙';
+      document.getElementById('theme-color-meta').setAttribute('content', state.theme === 'dark' ? '#0B1120' : '#0F172A');
+    }
+    function toggleTheme() {
+      state.theme = state.theme === 'dark' ? 'light' : 'dark';
+      save(); applyTheme();
+    }
+    applyTheme();
+
+    // Dynamic PWA Icon & Manifest
+    (function setupPWA() {
+      const c = document.createElement('canvas');
+      c.width = 512; c.height = 512;
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#0F172A';
+      ctx.fillRect(0, 0, 512, 512);
+      ctx.strokeStyle = '#D4A359';
+      ctx.lineWidth = 22;
+      ctx.strokeRect(36, 36, 440, 440);
+      ctx.fillStyle = '#D4A359';
+      ctx.font = 'bold 240px Cairo, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('✓', 256, 268);
+      const iconUrl = c.toDataURL('image/png');
+
+      const appleIcon = document.createElement('link');
+      appleIcon.rel = 'apple-touch-icon';
+      appleIcon.href = iconUrl;
+      document.head.appendChild(appleIcon);
+
+      const manifest = {
+        name: 'إنجازي — مهامي وجدولي',
+        short_name: 'إنجازي',
+        start_url: './',
+        display: 'standalone',
+        background_color: '#0F172A',
+        theme_color: '#0F172A',
+        icons: [{ src: iconUrl, sizes: '512x512', type: 'image/png' }]
+      };
+      const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+      const link = document.createElement('link');
+      link.rel = 'manifest';
+      link.href = URL.createObjectURL(blob);
+      document.head.appendChild(link);
+
+      if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
+        document.getElementById('install-btn').style.display = 'none';
+      }
+      window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; });
+    })();
+
+    function handleInstallClick() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
+      } else {
+        document.getElementById('install-modal').classList.add('open');
+      }
+    }
+
+    // Navigation
+    function switchTab(tab) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.getElementById('sec-' + tab).classList.add('active');
+      document.querySelectorAll('[data-tab]').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+    }
+
+    // Summary
+    function updateSummary() {
+      const todaySched = state.schedule[selectedDay] || [];
+      const total = state.tasks.length + todaySched.length;
+      const done = state.tasks.filter(t => t.done).length + todaySched.filter(s => s.done).length;
+      const pct = total ? Math.round((done / total) * 100) : 0;
+      document.getElementById('progress-pct').textContent = pct + '%';
+      document.getElementById('progress-bar').style.width = pct + '%';
+      document.getElementById('stat-done').textContent = done;
+      document.getElementById('stat-left').textContent = total - done;
+      document.getElementById('stat-pomo').textContent = state.pomoCount;
+    }
+
+    // Tasks
+    function addTask(e) {
+      e.preventDefault();
+      const title = document.getElementById('task-title').value.trim();
+      if (!title) return;
+      state.tasks.unshift({
+        id: Date.now(),
+        title,
+        cat: document.getElementById('task-cat').value,
+        prio: document.getElementById('task-prio').value,
+        time: document.getElementById('task-time').value,
+        done: false
+      });
+      document.getElementById('task-form').reset();
+      save(); renderTasks();
+    }
+    function toggleTask(id) {
+      const t = state.tasks.find(x => x.id === id);
+      if (t) t.done = !t.done;
+      save(); renderTasks();
+    }
+    function deleteTask(id) {
+      state.tasks = state.tasks.filter(x => x.id !== id);
+      save(); renderTasks();
+    }
+    function clearCompletedTasks() {
+      state.tasks = state.tasks.filter(x => !x.done);
+      save(); renderTasks();
+    }
+    function setTaskFilter(f, btn) {
+      taskFilter = f;
+      document.querySelectorAll('#status-filters .chip').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      renderTasks();
+    }
+    function focusTask(title) {
+      pomoLabel = title;
+      document.getElementById('pomo-task-label').textContent = title;
+      switchTab('pomo');
+    }
+    function renderTasks() {
+      const list = document.getElementById('tasks-list');
+      const filtered = state.tasks.filter(t => taskFilter === 'all' ? true : taskFilter === 'done' ? t.done : !t.done);
+      if (!filtered.length) {
+        list.innerHTML = '<div class="empty-state">لا توجد مهام هنا حالياً ✨</div>';
+      } else {
+        const prioMap = { high: ['عالية', 'prio-high'], med: ['متوسطة', 'prio-med'], low: ['منخفضة', 'prio-low'] };
+        list.innerHTML = filtered.map(t => `
+          <div class="item ${t.done ? 'done' : ''}">
+            <div class="item-left">
+              <button class="check-btn" onclick="toggleTask(${t.id})">${t.done ? '✓' : ''}</button>
+              <div>
+                <div class="item-title">${escapeHtml(t.title)}</div>
+                <div class="item-meta">
+                  <span class="badge">${t.cat}</span>
+                  <span class="badge ${prioMap[t.prio][1]}">${prioMap[t.prio][0]}</span>
+                  ${t.time ? `<span class="badge">🕒 ${t.time}</span>` : ''}
+                </div>
+              </div>
+            </div>
+            <div class="item-actions">
+              ${!t.done ? `<button class="small-btn" onclick="focusTask('${escapeAttr(t.title)}')">⏱ تركيز</button>` : ''}
+              <button class="small-btn danger" onclick="deleteTask(${t.id})">حذف</button>
+            </div>
+          </div>`).join('');
+      }
+      updateSummary();
+    }
+
+    // Schedule
+    function renderDaysBar() {
+      document.getElementById('days-bar').innerHTML = DAYS.map((d, i) => `
+        <button class="day-btn ${i === selectedDay ? 'active' : ''}" onclick="selectDay(${i})">${d}</button>
+      `).join('');
+    }
+    function selectDay(i) { selectedDay = i; renderDaysBar(); renderSchedule(); }
+    function addScheduleItem(e) {
+      e.preventDefault();
+      const title = document.getElementById('sched-title').value.trim();
+      const start = document.getElementById('sched-start').value;
+      const end = document.getElementById('sched-end').value;
+      if (!title || !start) return;
+      if (!state.schedule[selectedDay]) state.schedule[selectedDay] = [];
+      state.schedule[selectedDay].push({ id: Date.now(), title, start, end, done: false });
+      state.schedule[selectedDay].sort((a, b) => a.start.localeCompare(b.start));
+      document.getElementById('sched-form').reset();
+      save(); renderSchedule();
+    }
+    function toggleSched(id) {
+      const item = (state.schedule[selectedDay] || []).find(x => x.id === id);
+      if (item) item.done = !item.done;
+      save(); renderSchedule();
+    }
+    function deleteSched(id) {
+      state.schedule[selectedDay] = (state.schedule[selectedDay] || []).filter(x => x.id !== id);
+      save(); renderSchedule();
+    }
+    function renderSchedule() {
+      const list = document.getElementById('schedule-list');
+      const items = state.schedule[selectedDay] || [];
+      if (!items.length) {
+        list.innerHTML = `<div class="empty-state">لا توجد مواعيد ليوم ${DAYS[selectedDay]} 📅</div>`;
+      } else {
+        list.innerHTML = items.map(s => `
+          <div class="item ${s.done ? 'done' : ''}">
+            <div class="item-left">
+              <button class="check-btn" onclick="toggleSched(${s.id})">${s.done ? '✓' : ''}</button>
+              <div>
+                <div class="item-title">${escapeHtml(s.title)}</div>
+                <div class="item-meta">
+                  <span class="badge">🕒 ${s.start}${s.end ? ' — ' + s.end : ''}</span>
+                </div>
+              </div>
+            </div>
+            <div class="item-actions">
+              <button class="small-btn danger" onclick="deleteSched(${s.id})">حذف</button>
+            </div>
+          </div>`).join('');
+      }
+      updateSummary();
+    }
+
+    // Pomodoro
+    function updatePomoUI() {
+      const m = String(Math.floor(pomoLeft / 60)).padStart(2, '0');
+      const s = String(pomoLeft % 60).padStart(2, '0');
+      const txt = `${m}:${s}`;
+      document.getElementById('pomo-display').textContent = txt;
+      document.getElementById('pill-time').textContent = txt;
+      const offset = 603.19 * (1 - pomoLeft / pomoTotal);
+      document.getElementById('pomo-circle').style.strokeDashoffset = offset;
+    }
+    function setPomoMode(mins, label, btn) {
+      clearInterval(pomoTimer); pomoTimer = null;
+      pomoTotal = mins * 60; pomoLeft = pomoTotal; pomoLabel = label;
+      document.getElementById('pomo-task-label').textContent = label;
+      document.getElementById('pomo-start-btn').textContent = 'ابدأ';
+      document.getElementById('live-timer-pill').classList.remove('active');
+      document.querySelectorAll('#sec-pomo .chip').forEach(c => c.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      updatePomoUI();
+    }
+    function togglePomo() {
+      if (pomoTimer) {
+        clearInterval(pomoTimer); pomoTimer = null;
+        document.getElementById('pomo-start-btn').textContent = 'استئناف';
+        document.getElementById('live-timer-pill').classList.remove('active');
+      } else {
+        document.getElementById('pomo-start-btn').textContent = 'إيقاف مؤقت';
+        document.getElementById('live-timer-pill').classList.add('active');
+        pomoTimer = setInterval(() => {
+          pomoLeft--;
+          updatePomoUI();
+          if (pomoLeft <= 0) {
+            clearInterval(pomoTimer); pomoTimer = null;
+            document.getElementById('pomo-start-btn').textContent = 'ابدأ';
+            document.getElementById('live-timer-pill').classList.remove('active');
+            if (pomoTotal >= 15 * 60) { state.pomoCount++; save(); updateSummary(); }
+            if (!pomoMuted) playBeep();
+            pomoLeft = pomoTotal; updatePomoUI();
+          }
+        }, 1000);
+      }
+    }
+    function resetPomo() {
+      clearInterval(pomoTimer); pomoTimer = null;
+      pomoLeft = pomoTotal;
+      document.getElementById('pomo-start-btn').textContent = 'ابدأ';
+      document.getElementById('live-timer-pill').classList.remove('active');
+      updatePomoUI();
+    }
+    function toggleMute() {
+      pomoMuted = !pomoMuted;
+      document.getElementById('mute-btn').textContent = pomoMuted ? '🔇 صامت' : '🔊 صوت';
+    }
+    function playBeep() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const o = ctx.createOscillator(); const g = ctx.createGain();
+        o.type = 'sine'; o.frequency.value = 660;
+        g.gain.setValueAtTime(0.2, ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.8);
+        o.connect(g); g.connect(ctx.destination);
+        o.start(); o.stop(ctx.currentTime + 0.8);
+      } catch (e) {}
+    }
+
+    // Notes
+    function addNote(e) {
+      e.preventDefault();
+      const text = document.getElementById('note-text').value.trim();
+      if (!text) return;
+      state.notes.unshift({
+        id: Date.now(),
+        text,
+        color: document.getElementById('note-color').value,
+        pinned: false
+      });
+      document.getElementById('note-form').reset();
+      save(); renderNotes();
+    }
+    function togglePin(id) {
+      const n = state.notes.find(x => x.id === id);
+      if (n) n.pinned = !n.pinned;
+      save(); renderNotes();
+    }
+    function deleteNote(id) {
+      state.notes = state.notes.filter(x => x.id !== id);
+      save(); renderNotes();
+    }
+    function renderNotes() {
+      const q = document.getElementById('note-search').value.trim().toLowerCase();
+      const list = document.getElementById('notes-list');
+      const notes = [...state.notes]
+        .filter(n => n.text.toLowerCase().includes(q))
+        .sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
+      if (!notes.length) {
+        list.innerHTML = '<div class="empty-state" style="grid-column:1/-1">لا توجد ملاحظات بعد 📝</div>';
+      } else {
+        list.innerHTML = notes.map(n => `
+          <div class="note-card ${n.color}">
+            <div class="note-text">${escapeHtml(n.text)}</div>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <button class="small-btn" onclick="togglePin(${n.id})">${n.pinned ? '📌 مثبتة' : 'تثبيت'}</button>
+              <button class="small-btn danger" onclick="deleteNote(${n.id})">حذف</button>
+            </div>
+          </div>`).join('');
+      }
+    }
+
+    function escapeHtml(s) {
+      return s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    }
+    function escapeAttr(s) { return s.replace(/'/g, "\'"); }
+
+    renderDaysBar();
+    renderTasks();
+    renderSchedule();
+    renderNotes();
+    updatePomoUI();
+  </script>
+</body>
+</html>
