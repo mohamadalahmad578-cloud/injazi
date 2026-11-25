@@ -73,6 +73,12 @@
     }
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     html { scroll-behavior: smooth; background: var(--bg); }
+    body::before {
+      content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+      background-image: radial-gradient(color-mix(in srgb, var(--text) 7%, transparent) 1px, transparent 1px);
+      background-size: 22px 22px;
+      mask-image: linear-gradient(180deg, #000, transparent 70%); -webkit-mask-image: linear-gradient(180deg, #000, transparent 70%);
+    }
     body {
       font-family: 'Cairo', system-ui, -apple-system, 'Segoe UI', sans-serif;
       background: var(--bg-grad), var(--bg);
@@ -196,7 +202,11 @@
       display: flex; flex-direction: column; align-items: center; gap: 2px;
       font-size: .72rem; font-weight: 700; padding: 7px 4px; border-radius: 16px; transition: .2s;
     }
+    .mobile-nav button { position: relative; }
+    .mobile-nav button .i { transition: transform .25s var(--ease); }
     .mobile-nav button.active { color: var(--accent); background: var(--accent-soft); }
+    .mobile-nav button.active .i { transform: translateY(-2px) scale(1.08); }
+    .mobile-nav button.active::after { content: ''; position: absolute; bottom: 3px; width: 4px; height: 4px; border-radius: 50%; background: var(--accent); }
     @media (max-width: 680px) {
       .desktop-nav { display: none; }
       .mobile-nav { display: flex; }
@@ -290,6 +300,36 @@
       transition: transform .2s var(--ease), box-shadow .2s, opacity .3s, border-color .2s;
       animation: itemIn .3s var(--ease) both;
     }
+    .item-list > .item, .notes-grid > .note-card { animation-delay: calc(var(--i, 0) * 35ms); }
+    .card { transition: box-shadow .25s, border-color .25s; }
+    .card:focus-within { border-color: color-mix(in srgb, var(--accent) 40%, var(--border)); box-shadow: var(--shadow), 0 0 0 4px var(--accent-soft); }
+    .summary .ring::after { content: ''; position: absolute; inset: 10px; border-radius: 50%; box-shadow: 0 0 40px rgba(226,180,106,.18) inset; pointer-events: none; }
+    .summary::after { content: ''; position: absolute; inset: 0; pointer-events: none; border-radius: inherit;
+      background: linear-gradient(115deg, transparent 30%, rgba(255,255,255,.06) 45%, transparent 60%); background-size: 250% 100%; animation: shine 7s ease-in-out infinite; }
+    @keyframes shine { 0%, 60% { background-position: 120% 0; } 100% { background-position: -120% 0; } }
+    /* Brand: Random Robot */
+    .credit { display: flex; flex-direction: column; align-items: center; gap: 6px; margin: 30px auto 6px; color: var(--text-muted); font-size: .78rem; text-align: center; }
+    .credit a { display: inline-flex; align-items: center; gap: 8px; color: var(--text-2); text-decoration: none; font-weight: 700; padding: 6px 12px 6px 8px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); box-shadow: var(--shadow-sm); transition: .2s; }
+    .credit a:hover { border-color: var(--accent); transform: translateY(-1px); }
+    .credit .rr { width: 26px; height: 26px; }
+    .credit b { font-weight: 800; letter-spacing: .2px; direction: ltr; }
+    .rr-eye { animation: blink 5s infinite; transform-origin: center; transform-box: fill-box; }
+    @keyframes blink { 0%, 94%, 100% { transform: scaleY(1); } 97% { transform: scaleY(.1); } }
+    .about { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 16px; background: var(--surface-2); margin: 8px 0 16px; }
+    .about svg { width: 48px; height: 48px; flex-shrink: 0; }
+    .about strong { display: block; font-size: .95rem; }
+    .about span { font-size: .78rem; color: var(--text-muted); }
+    #splash { position: fixed; inset: 0; z-index: 300; display: grid; place-items: center; background: #0A0F1C; transition: opacity .45s, visibility .45s; }
+    #splash.gone { opacity: 0; visibility: hidden; }
+    #splash[hidden] { display: none; }
+    #splash .sp { display: flex; flex-direction: column; align-items: center; gap: 14px; color: #F1F5F9; animation: spIn .6s var(--ease) both; }
+    #splash .sp > svg { width: 84px; height: 84px; filter: drop-shadow(0 10px 30px rgba(226,180,106,.35)); }
+    #splash h2 { font-size: 1.6rem; font-weight: 800; }
+    #splash .by { display: flex; align-items: center; gap: 8px; font-size: .78rem; color: #8A99B2; margin-top: 14px; direction: ltr; }
+    #splash .by svg { width: 22px; height: 22px; }
+    #splash .ring-draw { stroke-dasharray: 120; stroke-dashoffset: 120; animation: draw .9s .15s var(--ease) forwards; }
+    @keyframes draw { to { stroke-dashoffset: 0; } }
+    @keyframes spIn { from { opacity: 0; transform: scale(.92); } to { opacity: 1; transform: none; } }
     @keyframes itemIn { from { opacity: 0; transform: translateY(6px) scale(.99); } to { opacity: 1; transform: none; } }
     .item:hover { box-shadow: var(--shadow); border-color: color-mix(in srgb, var(--accent) 30%, var(--border)); }
     .item::before { content: ''; position: absolute; right: 0; top: 12px; bottom: 12px; width: 3px; border-radius: 3px 0 0 3px; background: transparent; }
@@ -317,6 +357,17 @@
     .badge.today { background: var(--accent-soft); color: var(--accent); }
     .badge.conflict { background: var(--warning-soft); color: #B45309; }
     [data-theme="dark"] .badge.conflict { color: var(--warning); }
+    .badge.repeat { background: rgba(59,130,246,.12); color: var(--blue); }
+    [data-theme="dark"] .badge.repeat { color: #93C5FD; }
+    .badge.streak { background: rgba(251,146,60,.14); color: #EA580C; }
+    [data-theme="dark"] .badge.streak { color: #FDBA74; }
+    .day-picks { display: flex; flex-wrap: wrap; gap: 6px; }
+    .day-picks[hidden] { display: none; }
+    .day-picks label { position: relative; }
+    .day-picks input { position: absolute; opacity: 0; pointer-events: none; }
+    .day-picks span { display: inline-block; border: 1px solid var(--border); background: var(--surface); color: var(--text-muted); padding: 5px 11px; border-radius: 999px; font-size: .8rem; font-weight: 700; cursor: pointer; transition: .15s; user-select: none; }
+    .day-picks input:checked + span { background: var(--primary); color: var(--on-primary); border-color: transparent; }
+    .day-picks input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
     .badge.now { background: var(--success-soft); color: var(--success); }
     .item-actions { display: flex; gap: 4px; opacity: .85; }
     .small-btn {
@@ -522,7 +573,21 @@
       <symbol id="i-chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
       <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="14" height="14" rx="2"/><path d="M4 16a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2"/></symbol>
       <symbol id="i-sparkle" viewBox="0 0 24 24"><path d="M12 3l1.9 5.8L20 10.7l-6.1 1.9L12 18.5l-1.9-5.9L4 10.7l6.1-1.9z"/></symbol>
+      <symbol id="i-repeat" viewBox="0 0 24 24"><path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/></symbol>
       <symbol id="i-tomato" viewBox="0 0 24 24"><circle cx="12" cy="14" r="7"/><path d="M12 7V4M9 6.5 12 7l3-.5"/></symbol>
+      <symbol id="rr-logo" viewBox="0 0 64 64">
+        <rect width="64" height="64" rx="17" fill="#111827"/>
+        <path d="M32 17v-6" stroke="#E2B46A" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="32" cy="9" r="4" fill="#E2B46A"/>
+        <rect x="9" y="28" width="5" height="12" rx="2.5" fill="#CBD5E1"/>
+        <rect x="50" y="28" width="5" height="12" rx="2.5" fill="#CBD5E1"/>
+        <rect x="13" y="17" width="38" height="33" rx="11" fill="#F1F5F9"/>
+        <g class="rr-eye"><circle cx="24.5" cy="31" r="4.5" fill="#111827"/><circle cx="26" cy="29.5" r="1.4" fill="#fff"/></g>
+        <rect x="34" y="25.5" width="11" height="11" rx="3" fill="#E2B46A"/>
+        <circle cx="37" cy="28.5" r="1.3" fill="#111827"/><circle cx="39.5" cy="31" r="1.3" fill="#111827"/><circle cx="42" cy="33.5" r="1.3" fill="#111827"/>
+        <path d="M22 42.5l3.3-2.4 3.4 2.4 3.3-2.4 3.4 2.4 3.3-2.4 3.3 2.4" fill="none" stroke="#3B82F6" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+        <rect x="24" y="52" width="16" height="4" rx="2" fill="#E2B46A" opacity=".8"/>
+      </symbol>
       <linearGradient id="g-logo" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1B2540"/><stop offset="1" stop-color="#0F172A"/></linearGradient>
     </defs>
   </svg>
@@ -602,8 +667,10 @@
                 <select id="task-prio"><option value="high">عالية</option><option value="med" selected>متوسطة</option><option value="low">منخفضة</option></select></div>
               <div class="field"><label for="task-due">التاريخ</label><input id="task-due" type="date" /></div>
               <div class="field"><label for="task-time">الوقت</label><input id="task-time" type="time" /></div>
+              <div class="field half"><label for="task-rep">التكرار</label><select id="task-rep" name="rep"></select></div>
+              <div class="field full"><div class="day-picks" id="task-rdays" hidden></div></div>
             </div>
-            <p class="hint">اكتب بشكل طبيعي وسيفهمك إنجازي: <code>اليوم</code> <code>غداً</code> <code>بعد غد</code> <code>الخميس</code> <code>5م</code> <code>17:30</code> <code>!</code> للأولوية العالية، <code>#دراسة</code> للتصنيف.</p>
+            <p class="hint">اكتب بشكل طبيعي وسيفهمك إنجازي: <code>اليوم</code> <code>غداً</code> <code>بعد غد</code> <code>الخميس</code> <code>5م</code> <code>17:30</code> <code>!</code> للأولوية العالية، <code>#دراسة</code> للتصنيف، وللتكرار: <code>يومياً</code> <code>أسبوعياً</code> <code>كل خميس</code> <code>كل أحد وثلاثاء</code>.</p>
           </details>
         </form>
       </div>
@@ -696,7 +763,24 @@
       </div>
       <div class="notes-grid" id="notes-list"></div>
     </section>
+    <footer class="credit">
+      <a href="#" id="credit-link" aria-label="عن إنجازي و Random Robot"><svg class="rr" aria-hidden="true"><use href="#rr-logo"/></svg>إنجازي · صُنع بواسطة <b>Random Robot</b></a>
+      <span>جميع بياناتك محفوظة على جهازك فقط</span>
+    </footer>
   </main>
+
+  <div id="splash" aria-hidden="true">
+    <div class="sp">
+      <svg viewBox="0 0 64 64">
+        <rect width="64" height="64" rx="18" fill="url(#g-logo)"/>
+        <circle cx="32" cy="32" r="19" fill="none" stroke="#E2B46A" stroke-opacity=".2" stroke-width="5"/>
+        <path class="ring-draw" d="M32 13a19 19 0 1 1-17.6 11.8" fill="none" stroke="#E2B46A" stroke-width="5" stroke-linecap="round"/>
+        <path d="m23.5 32.5 6 6 11-12" fill="none" stroke="#F5D08E" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <h2>إنجازي</h2>
+      <div class="by"><svg><use href="#rr-logo"/></svg><span>Made by <b style="color:#E2B46A">Random Robot</b></span></div>
+    </div>
+  </div>
 
   <!-- Mobile Nav -->
   <nav class="mobile-nav" aria-label="الأقسام">
@@ -807,7 +891,9 @@
     s.tasks = (s.tasks || []).map(t => ({
       id: String(t.id ?? uid()), title: String(t.title || ''), cat: t.cat || 'عام', prio: PRIO[t.prio] ? t.prio : 'med',
       due: t.due || '', time: t.time || '', done: !!t.done, doneAt: t.doneAt ?? (t.done ? Date.now() : null),
-      created: t.created ?? (typeof t.id === 'number' ? t.id : Date.now()), pomos: t.pomos || 0
+      created: t.created ?? (typeof t.id === 'number' ? t.id : Date.now()), pomos: t.pomos || 0,
+      repeat: Array.isArray(t.repeat) ? [...new Set(t.repeat.map(Number).filter(d => d >= 0 && d < 7))].sort((a, b) => a - b) : [],
+      doneOn: t.doneOn || '', log: Array.isArray(t.log) ? t.log.slice(-120) : []
     }));
     const sch = {};
     for (const [d, items] of Object.entries(s.schedule || {})) {
@@ -954,6 +1040,65 @@
   });
 
   /* ============================ Summary & insights ============================ */
+  /* -------- Recurring tasks --------
+     t.repeat = list of weekdays (Saturday=0 … Friday=6). Each occurrence is completed on its own:
+     t.doneOn holds the occurrence date that was completed, t.log keeps the history for streaks. */
+  const ALL_DAYS = [0, 1, 2, 3, 4, 5, 6];
+  const isRecurring = t => t.repeat && t.repeat.length > 0;
+  function nextOcc(t, fromKey = dayKey()) {        // first occurrence on/after fromKey
+    let d = parseKey(fromKey);
+    for (let i = 0; i < 7; i++, d = addDays(d, 1)) if (t.repeat.includes(arDay(d))) return dayKey(d);
+    return fromKey;
+  }
+  function prevOcc(t, beforeKey) {                  // last occurrence strictly before beforeKey
+    let d = addDays(parseKey(beforeKey), -1);
+    for (let i = 0; i < 7; i++, d = addDays(d, -1)) if (t.repeat.includes(arDay(d))) return dayKey(d);
+    return null;
+  }
+  /** Derive the current occurrence (due) and done-state of every recurring task. Missed days simply roll forward. */
+  function syncRecurring() {
+    const today = dayKey();
+    for (const t of state.tasks) {
+      if (!isRecurring(t)) continue;
+      const occ = nextOcc(t, today);
+      t.due = occ;
+      t.done = t.doneOn === occ;
+      if (!t.done) t.doneAt = null;
+    }
+  }
+  /** Consecutive completed occurrences, ending at the current one (or the previous one if today's isn't done yet). */
+  function taskStreak(t) {
+    if (!isRecurring(t) || !t.log.length) return 0;
+    const done = new Set(t.log);
+    let k = nextOcc(t, dayKey());
+    if (!done.has(k)) k = prevOcc(t, k);
+    let n = 0;
+    while (k && done.has(k) && n < 400) { n++; k = prevOcc(t, k); }
+    return n;
+  }
+  function repeatLabel(days) {
+    if (!days?.length) return '';
+    if (days.length === 7) return 'يومياً';
+    if (days.length === 1) return 'كل ' + DAYS[days[0]].replace(/^ال/, '');
+    return days.map(d => DAYS_SHORT[d]).join('، ');
+  }
+  const REP_OPTS = [['none', 'بدون تكرار'], ['daily', 'يومياً'], ['weekly', 'أسبوعياً (نفس اليوم)'], ['custom', 'أيام محددة…']];
+  function repeatMode(days) { return !days.length ? 'none' : days.length === 7 ? 'daily' : 'custom'; }
+  function dayPicksHTML(days, name = 'rd') {
+    return DAYS.map((d, i) => `<label><input type="checkbox" name="${name}" value="${i}" ${days.includes(i) ? 'checked' : ''}><span>${d}</span></label>`).join('');
+  }
+  /** Read repeat days from a select + day checkboxes. `baseDue` decides the weekday for "weekly". */
+  function readRepeat(mode, checked, baseDue) {
+    if (mode === 'daily') return [...ALL_DAYS];
+    if (mode === 'weekly') return [arDay(baseDue ? parseKey(baseDue) : new Date())];
+    if (mode === 'custom') return [...new Set(checked.map(Number))].sort((a, b) => a - b);
+    return [];
+  }
+  function wireRepeat(select, picks) {
+    const sync = () => { picks.hidden = select.value !== 'custom'; };
+    select.addEventListener('change', sync); sync();
+  }
+
   function isTodayTask(t, today = dayKey()) {
     if (t.done) return t.doneAt && dayKey(new Date(t.doneAt)) === today;
     return !t.due || t.due <= today;                    // undated, due today, or overdue
@@ -982,7 +1127,7 @@
 
     const h = new Date().getHours();
     $('#greeting').textContent = h < 5 ? 'سهرة موفّقة 🌙' : h < 12 ? 'صباح الخير ☀️' : h < 17 ? 'نهارك سعيد 🌤️' : 'مساء الخير 🌆';
-    const overdue = state.tasks.filter(t => !t.done && dueTs(t) < Date.now()).length;
+    const overdue = state.tasks.filter(t => !t.done && !isRecurring(t) && dueTs(t) < Date.now()).length;
     let msg;
     if (!total) msg = 'لا شيء على قائمتك اليوم — أضف أول مهمة وابدأ.';
     else if (pct === 100) msg = 'أنجزت كل شيء اليوم! عمل رائع 🎉';
@@ -1020,6 +1165,14 @@
     take(/\s(?:بعد\s?غد|بعد\s?بكر[ةه])\s/, () => out.due = dayKey(addDays(now, 2)));
     take(/\s(?:غد(?:اً|ا|ً)?|بكر[ةه]|بكرا)\s/, () => out.due = dayKey(addDays(now, 1)));
     take(/\s(?:اليوم|الليلة|الليله)\s/, () => out.due = dayKey(now));
+    const DAY_ALT = '(?:ال)?(?:سبت|أحد|احد|إثنين|اثنين|ثلاثاء|ثلاثا|أربعاء|اربعاء|خميس|جمعة|جمعه)';
+    const dayOf = name => { const k = norm(name).replace(/^ال/, '').replace(/ثلاثا$/, 'ثلاثاء'); return DAYS.findIndex(d => norm(d).replace(/^ال/, '') === k); };
+    take(new RegExp(`\\sكل\\s(?:يوم\\s)?(${DAY_ALT}(?:\\s?(?:،|,)?\\s?و?\\s?${DAY_ALT})*)\\s`), m => {
+      const found = m[1].match(new RegExp(DAY_ALT, 'g')).map(dayOf).filter(i => i >= 0);
+      if (found.length) out.repeat = [...new Set(found)].sort((a, b) => a - b);
+    });
+    take(/\s(?:يومي(?:اً|ا)?|كل\sيوم|كل\sالأيام|كل\sالايام)\s/, () => out.repeat = [...ALL_DAYS]);
+    take(/\s(?:[أا]سبوعي(?:اً|ا)?|كل\s[أا]سبوع)\s/, () => out.weekly = true);
     take(/\s(?:يوم\s)?(السبت|الأحد|الاحد|الإثنين|الاثنين|الثلاثاء|الثلاثا|الأربعاء|الاربعاء|الخميس|الجمعة|الجمعه)\s/, m => {
       const idx = DAYS.findIndex(d => norm(d) === norm(m[1]).replace(/ثلاثا$/, 'ثلاثاء'));
       if (idx >= 0) { let diff = (idx - arDay(now) + 7) % 7; if (diff === 0) diff = 7; out.due = dayKey(addDays(now, diff)); }
@@ -1038,7 +1191,10 @@
     take(/\s#(\S+)\s/, m => { const c = CATS.find(c => norm(c.id) === norm(m[1])); if (c) out.cat = c.id; });
     // trailing "!" glued to a word, e.g. "اتصل بالبنك!"
     s = s.replace(/(\S)!+\s/g, (_, c) => { out.prio = 'high'; return c + ' '; });
-    if (out.time && !out.due) out.due = dayKey(now);
+    if (out.weekly && !out.repeat) out.repeat = [arDay(out.due ? parseKey(out.due) : now)];
+    delete out.weekly;
+    if (out.repeat) delete out.due;                  // a recurring task's date comes from its schedule
+    else if (out.time && !out.due) out.due = dayKey(now);
     out.title = s.replace(/\s+/g, ' ').trim();
     return out;
   }
@@ -1046,6 +1202,7 @@
     const raw = $('#task-title').value;
     const p = raw.trim() ? parseQuick(raw) : {};
     const chips = [];
+    if (p.repeat) chips.push(`${ic('repeat')}${esc(repeatLabel(p.repeat))}`);
     if (p.due) chips.push(`${ic('calendar')}${esc(dueLabel(p.due))}`);
     if (p.time) chips.push(`${ic('clock')}${fmtTime(p.time)}`);
     if (p.prio) chips.push(`${ic('alert')}أولوية ${PRIO[p.prio].label}`);
@@ -1090,7 +1247,7 @@
   function taskGroup(t, today) {
     if (t.done) return 'done';
     const ts = dueTs(t);
-    if (ts < Date.now()) return 'overdue';
+    if (ts < Date.now() && !isRecurring(t)) return 'overdue';
     if (!t.due || t.due === today) return 'today';
     return 'upcoming';
   }
@@ -1107,10 +1264,14 @@
       prio: p.prio || formPrio,
       due: $('#task-due').value || p.due || '',
       time: $('#task-time').value || p.time || '',
-      done: false, doneAt: null, created: Date.now(), pomos: 0
+      done: false, doneAt: null, created: Date.now(), pomos: 0, repeat: [], doneOn: '', log: []
     };
+    const formRep = readRepeat($('#task-rep').value, $$('#task-rdays input:checked').map(i => i.value), t.due);
+    t.repeat = formRep.length ? formRep : (p.repeat || []);
     state.tasks.push(t);
+    if (isRecurring(t)) toast(`مهمة متكررة: ${repeatLabel(t.repeat)} 🔁`);
     $('#task-title').value = ''; $('#task-due').value = ''; $('#task-time').value = ''; $('#task-prio').value = 'med';
+    $('#task-rep').value = 'none'; $$('#task-rdays input').forEach(i => i.checked = false); $('#task-rdays').hidden = true;
     renderParsePreview();
     save(); renderTasks();
   }
@@ -1120,6 +1281,12 @@
     t.done = !t.done;
     if (t.done) { t.doneAt = Date.now(); hist().t++; }
     else { if (t.doneAt && dayKey(new Date(t.doneAt)) === dayKey()) hist().t = Math.max(0, hist().t - 1); t.doneAt = null; }
+    if (isRecurring(t)) {                              // complete / reopen only the current occurrence
+      const occ = t.due || nextOcc(t);
+      if (t.done) { t.doneOn = occ; if (!t.log.includes(occ)) t.log = [...t.log, occ].slice(-120); }
+      else { t.doneOn = ''; t.log = t.log.filter(k => k !== occ); }
+      if (t.done) { const st = taskStreak(t); if (st >= 3) toast(`🔥 ${st} مرات متتالية — استمر!`); }
+    }
     save();
     const row = btn?.closest('.item');
     if (row) { row.classList.toggle('done', t.done); btn.classList.add('bounce'); }
@@ -1144,13 +1311,20 @@
         <div class="field half"><label>الأولوية</label><select name="prio">${Object.entries(PRIO).map(([k, v]) => `<option value="${k}" ${k === t.prio ? 'selected' : ''}>${v.label}</option>`).join('')}</select></div>
         <div class="field half"><label>التاريخ</label><input type="date" name="due" value="${esc(t.due)}"/></div>
         <div class="field half"><label>الوقت</label><input type="time" name="time" value="${esc(t.time)}"/></div>
+        <div class="field full"><label>التكرار</label><select name="rep">${REP_OPTS.map(([k, l]) => `<option value="${k}" ${k === repeatMode(t.repeat) ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
+        <div class="field full"><div class="day-picks" id="edit-rdays">${dayPicksHTML(t.repeat)}</div></div>
         <div class="modal-actions full"><button type="button" class="btn" data-close>إلغاء</button><button class="btn btn-primary" type="submit">حفظ</button></div>
       </form>`, fd => {
       const title = fd.get('title').trim();
       if (!title) return false;
-      Object.assign(t, { title, cat: fd.get('cat'), prio: fd.get('prio'), due: fd.get('due'), time: fd.get('time') });
+      const repeat = readRepeat(fd.get('rep'), fd.getAll('rd'), fd.get('due'));
+      if (fd.get('rep') === 'custom' && !repeat.length) { toast('اختر يوماً واحداً على الأقل'); return false; }
+      const wasRecurring = isRecurring(t);
+      Object.assign(t, { title, cat: fd.get('cat'), prio: fd.get('prio'), due: fd.get('due'), time: fd.get('time'), repeat });
+      if (wasRecurring && !repeat.length) { t.doneOn = ''; t.log = []; t.done = false; t.doneAt = null; }
       save(); renderTasks();
     });
+    wireRepeat($('#modal-body select[name=rep]'), $('#edit-rdays'));
   }
   function focusTask(id) {
     state.pomo.taskId = id;
@@ -1159,9 +1333,9 @@
   }
   function clearCompleted() {
     const before = state.tasks;
-    const n = before.filter(t => t.done).length;
+    const n = before.filter(t => t.done && !isRecurring(t)).length;   // recurring tasks reset themselves
     if (!n) return;
-    state.tasks = before.filter(t => !t.done);
+    state.tasks = before.filter(t => !t.done || isRecurring(t));
     save(); renderTasks();
     toast(`تم مسح ${n} ${n === 1 ? 'مهمة مكتملة' : 'مهام مكتملة'}`, 'تراجع', () => { state.tasks = before; save(); renderTasks(); });
   }
@@ -1170,7 +1344,7 @@
     const cat = CATS.find(c => c.id === t.cat) || { icon: '📌' };
     let due = '';
     if (t.due || t.time) {
-      const overdue = !t.done && dueTs(t) < Date.now();
+      const overdue = !t.done && !isRecurring(t) && dueTs(t) < Date.now();
       const label = [t.due ? dueLabel(t.due) : '', fmtTime(t.time)].filter(Boolean).join(' · ');
       const isToday = !t.due || t.due === dayKey();
       due = `<span class="badge ${overdue ? 'overdue' : isToday && !t.done ? 'today' : ''}">${ic(overdue ? 'alert' : 'clock')}${overdue ? 'متأخرة · ' : ''}${esc(label)}</span>`;
@@ -1184,6 +1358,8 @@
             <span class="badge">${cat.icon} ${esc(t.cat)}</span>
             ${t.prio === 'high' ? `<span class="badge" style="color:var(--danger)">عالية</span>` : ''}
             ${due}
+            ${isRecurring(t) ? `<span class="badge repeat">${ic('repeat')}${esc(repeatLabel(t.repeat))}</span>` : ''}
+            ${(() => { const st = taskStreak(t); return st >= 2 ? `<span class="badge streak">${ic('flame')}${st}</span>` : ''; })()}
             ${t.pomos ? `<span class="badge">${ic('tomato')}${t.pomos}</span>` : ''}
           </div>
         </div>
@@ -1197,12 +1373,13 @@
   function renderTasks() {
     const today = dayKey();
     const ts = terms(taskQuery);
-    const base = state.tasks.filter(t => (!catFilter || t.cat === catFilter) && (!ts.length || matchAll(t.title + ' ' + t.cat, ts)));
+    syncRecurring();
+    const base = state.tasks.filter(t => (taskFilter !== 'repeat' || isRecurring(t)) && (!catFilter || t.cat === catFilter) && (!ts.length || matchAll(t.title + ' ' + t.cat, ts)));
     const groups = { overdue: [], today: [], upcoming: [], done: [] };
     for (const t of base) groups[taskGroup(t, today)].push(t);
-    const counts = { all: base.length, today: groups.overdue.length + groups.today.length, upcoming: groups.upcoming.length, done: groups.done.length };
+    const counts = { repeat: state.tasks.filter(isRecurring).length, all: base.length, today: groups.overdue.length + groups.today.length, upcoming: groups.upcoming.length, done: groups.done.length };
 
-    const F = [['all', 'الكل'], ['today', 'اليوم'], ['upcoming', 'القادمة'], ['done', 'المكتملة']];
+    const F = [['all', 'الكل'], ['today', 'اليوم'], ['upcoming', 'القادمة'], ['repeat', 'المتكررة'], ['done', 'المكتملة']];
     $('#task-filters').innerHTML = F.map(([k, l]) => `<button class="chip ${taskFilter === k ? 'active' : ''}" data-f="${k}">${l}<span class="count">${counts[k]}</span></button>`).join('');
     const usedCats = CATS.filter(c => state.tasks.some(t => t.cat === c.id));
     $('#cat-filters').innerHTML = usedCats.length > 1
@@ -1213,6 +1390,7 @@
       all: [['overdue', 'متأخرة'], ['today', 'اليوم'], ['upcoming', 'القادمة'], ['done', 'المكتملة']],
       today: [['overdue', 'متأخرة'], ['today', 'اليوم']],
       upcoming: [['upcoming', '']],
+      repeat: [['overdue', 'متأخرة'], ['today', 'اليوم'], ['upcoming', 'القادمة'], ['done', 'أُنجزت']],
       done: [['done', '']]
     }[taskFilter];
     let html = '';
@@ -1223,14 +1401,18 @@
       html += sortTasks(groups[g]).map(t => renderTaskItem(t, ts)).join('');
     }
     if (!html) {
-      const msg = ts.length ? ['لا نتائج', 'جرّب كلمات بحث أخرى.'] : taskFilter === 'done' ? ['لم تُكمل مهام بعد', 'كل مهمة تُنجزها ستظهر هنا.'] : ['قائمتك فارغة ✨', 'أضف مهمة بالأعلى — جرّب: «مراجعة المشروع غداً 4م !»'];
+      const msg = ts.length ? ['لا نتائج', 'جرّب كلمات بحث أخرى.'] : taskFilter === 'repeat' ? ['لا توجد مهام متكررة', 'جرّب: «رياضة يومياً» أو «مراجعة كل خميس».'] : taskFilter === 'done' ? ['لم تُكمل مهام بعد', 'كل مهمة تُنجزها ستظهر هنا.'] : ['قائمتك فارغة ✨', 'أضف مهمة بالأعلى — جرّب: «مراجعة المشروع غداً 4م !»'];
       html = `<div class="empty-state">${emptyArt('tasks')}<strong>${msg[0]}</strong>${msg[1]}</div>`;
     }
     $('#tasks-list').innerHTML = html;
-    $('#clear-done').hidden = !groups.done.length || taskFilter === 'upcoming' || taskFilter === 'today';
+    $$('#tasks-list > .item').forEach((el, i) => el.style.setProperty('--i', Math.min(i, 12)));
+    $('#clear-done').hidden = !groups.done.some(t => !isRecurring(t)) || !['all', 'done'].includes(taskFilter);
     updateSummary();
   }
 
+  $('#task-rep').innerHTML = REP_OPTS.map(([k, l]) => `<option value="${k}">${l}</option>`).join('');
+  $('#task-rdays').innerHTML = dayPicksHTML([]);
+  wireRepeat($('#task-rep'), $('#task-rdays'));
   $('#task-cat').innerHTML = CATS.map(c => `<option value="${esc(c.id)}" ${c.id === 'عام' ? 'selected' : ''}>${c.icon} ${esc(c.id)}</option>`).join('');
   $('#task-form').addEventListener('submit', addTask);
   $('#task-title').addEventListener('input', renderParsePreview);
@@ -1627,6 +1809,8 @@
         <div class="setting-row">بدء التركيز تلقائياً بعد الاستراحة ${sw('autoFocus', s.autoFocus)}</div>
         <div class="setting-row">الصوت عند الانتهاء ${sw('sound', s.sound)}</div>
         <div class="setting-row">إشعارات عند الانتهاء ${sw('notify', s.notify)}</div>
+        <div class="settings-group">عن التطبيق</div>
+        <div class="about"><svg aria-hidden="true"><use href="#rr-logo"/></svg><div><strong>إنجازي — من Random Robot</strong><span>الإصدار 3.1 · مهام، مهام متكررة، جدول، تركيز وملاحظات</span></div></div>
         <div class="settings-group">بياناتك</div>
         <div class="modal-actions" style="margin:8px 0 16px">
           <button type="button" class="btn" id="export-btn">${ic('download')}تصدير نسخة</button>
@@ -1721,6 +1905,14 @@
   renderPomoTaskSelect();
   renderPomo();
   switchTab(state.tab || 'tasks');
+  $('#credit-link').onclick = e => { e.preventDefault(); $('#settings-btn').click(); };
+  (function splash() {
+    const el = $('#splash');
+    let seen = false;
+    try { seen = sessionStorage.getItem('injazi_splash'); sessionStorage.setItem('injazi_splash', '1'); } catch (e) {}
+    if (seen || matchMedia('(prefers-reduced-motion: reduce)').matches) { el.hidden = true; return; }
+    setTimeout(() => { el.classList.add('gone'); setTimeout(() => { el.hidden = true; }, 500); }, 1100);
+  })();
   syncTicker();
   setInterval(refreshTimeSensitive, 60_000);   // keep "overdue" / "now" markers fresh
   </script>
