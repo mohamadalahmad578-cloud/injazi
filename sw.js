@@ -1,5 +1,5 @@
 // إنجازي — offline support. Bump VERSION when shipping changes.
-const VERSION = 'injazi-v3.1.1';
+const VERSION = 'injazi-v3.1.2';
 const CORE = ['./', './index.html', './manifest.webmanifest', './icon.svg', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
